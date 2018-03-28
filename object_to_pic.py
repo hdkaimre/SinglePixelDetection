@@ -5,16 +5,24 @@ import ThorLabMeter as tlm
 import MatrixGenerator as mg
 
 #Creates a list of masks as matrices
-N=128
+N=1000
 images = mg.matrix_list(N,128)
 
 
 #installing the power meter
-deviceName=input("Sisesta seadme nimi:")
-power_meter=tlm.setUp(deviceName)
+#deviceName=input("Sisesta seadme nimi:")
+power_meter=tlm.setUp("USB0::0x1313::0x8078::P0012075::INSTR")
 
 
 intensity_count=list()  #creating a list to save intensity counts
+
+#calibration
+adjust = power_meter.read
+
+#For adjusting the projector
+start = cv2.imread('StartScreen.png',0)
+cv2.imshow('image',start)
+cv2.waitKey(1500)
 
 #Showing different masks and saving the reading of the intensity meter
 for img in images:
@@ -22,9 +30,9 @@ for img in images:
     img = img.astype(np.uint8)
     img = cv2.resize(img, (0,0), fx=5, fy=5)
     cv2.imshow('image',img)
-    cv2.waitKey(50)
-    intensity_count.append(power_meter.read)
-    cv2.waitKey(50)
+    cv2.waitKey(5)
+    intensity_count.append(power_meter.read-adjust)
+    cv2.waitKey(5)
 
 
 #weighing masks with results from the intensity meter
